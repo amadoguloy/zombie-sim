@@ -5,6 +5,10 @@ import threading
 import pandas as pd
 import numpy as np
 from folium.plugins import HeatMap
+from flask import Flask, render_template
+
+# Initialize Flask app
+app = Flask(__name__)
 
 # Initialize map centered on the US
 us_map = folium.Map(location=[39.8283, -98.5795], zoom_start=5)
@@ -66,9 +70,15 @@ def generate_map():
     while len(infected_points) < len(cities):
         us_map = folium.Map(location=[39.8283, -98.5795], zoom_start=5)
         HeatMap(infected_points).add_to(us_map)
-        us_map.save("zombie_simulation.html")
+        us_map.save("templates/zombie_simulation.html")
         time.sleep(1)
 
 # Start map updates
 threading.Thread(target=generate_map, daemon=True).start()
 
+@app.route('/')
+def index():
+    return render_template("zombie_simulation.html")
+
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0', port=8000)
